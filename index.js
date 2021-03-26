@@ -2,8 +2,6 @@ const Discord = require('discord.js');
 
 const client = new Discord.Client();
 
-const { token } = require('./config.json');
-
 const { readdirSync } = require('fs');
 
 const { join } = require('path');
@@ -20,3 +18,5 @@ for (const file of commandFiles) {
     const command = require(join(__dirname, "commands", `${file}`));
     client.commands.set(command.name, command);
 }
+
+client.login(process.env.TOKEN);
