@@ -1,21 +1,15 @@
-const Discord = require('discord.js');
-
 module.exports = {
-    name: "avatar",
-    description: "Brodcast someone's avatar",
-
-    async run (client, message, args) {
-
-        let member = message.mentions.users.first() || message.author
-
-        let avatar = member.displayAvatarURL({size: 1024})
-
-
-        const embed = new Discord.MessageEmbed()
-        .setTitle(`${member.username}'s avatar`)
-        .setImage(avatar)
-        .setColor("RANDOM")
-
-        message.channel.send(embed);
+  name: 'avatar',
+  description: 'Display avatar URL.',
+  execute(message) {
+    if (!message.mentions.users.size) {
+      return message.channel.send(`Votre avatar est : ${message.author.displayAvatarURL({ format: 'png' })}`);
     }
-}
+
+    const avatarList = message.mentions.users.map(user => {
+      return `L'avatar de ${user.username} est : ${user.displayAvatarURL({ format: 'png' })}`;
+    });
+
+    message.channel.send(avatarList);
+  }
+};
