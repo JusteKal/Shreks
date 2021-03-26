@@ -1,22 +1,35 @@
 const Discord = require('discord.js');
 
+const { prefix } = require('./config.json');
+
 const client = new Discord.Client();
+client.commands = new Discord.Collection();
 
-const { readdirSync } = require('fs');
-
-const { join } = require('path');
-
-client.commands= new Discord.Collection();
-
-const prefix = ';';
-//You can change the prefix if you like. It doesn't have to be !
-
-
-const commandFiles = readdirSync(join(__dirname, "commands")).filter(file => file.endsWith(".js"));
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
-    const command = require(join(__dirname, "commands", `${file}`));
-    client.commands.set(command.name, command);
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.name, command);
 }
+
+client.once('ready', () => {
+  console.log('Ready!');
+});
+
+client.on('message', message => {
+  if (!message.content.startsWith(prefix) || message.author.bot) return;
+
+    const args = message.content.slice(prefix.length).split(/ +/);
+    const command = args.shift().toLowerCase();
+
+    if (!client.commands.has(command)) return;
+
+    try {
+      client.commands.get(command).execute(message, args);
+    } catch (error) {
+      console.error(error);
+      message.reply("Une erreur s'est produite pendant l'exécution de la commande !");
+    }
+})
 
 client.login(process.env.TOKEN);
